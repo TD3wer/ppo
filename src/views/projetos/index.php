@@ -44,14 +44,6 @@
             font-size: 24px;
         }
 
-        /* Container principal */
-        .container {
-            padding: 100px 20px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
         /* Botão para adicionar novo projeto */
         .add-project-btn {
             padding: 12px 24px;
@@ -68,6 +60,14 @@
 
         .add-project-btn:hover {
             background-color: #666;
+        }
+
+        /* Container principal */
+        .container {
+            padding: 100px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         /* Projeto individual */
@@ -109,6 +109,28 @@
             color: #aaa;
         }
 
+        /* Ações (Editar/Excluir) */
+        .project-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-left: auto; /* Alinha à direita */
+        }
+
+        .project-actions a {
+            text-decoration: none;
+            color: white;
+            background-color: #555;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .project-actions a:hover {
+            background-color: #777;
+        }
+
         /* Voltar à página inicial */
         .voltar {
             display: block;
@@ -119,33 +141,42 @@
     </style>
 </head>
 <body>
-    <!-- Barra superior -->
-    <div class="header">
-        <div class="logo">
-            <img src="public/img/LogoB.png" alt="Logo Geoplantex">
-            <h1>GEOPLANTEX</h1>
-        </div>
-        <a href="?page=projetos&action=create" class="add-project-btn">+ Novo Projeto</a>
+
+<!-- Barra superior -->
+<div class="header">
+    <div class="logo">
+        <img src="public/img/LogoB.png" alt="Logo Geoplantex">
+        <h1>GEOPLANTEX</h1>
     </div>
+    <a href="?page=projetos&action=create" class="add-project-btn">+ Novo Projeto</a>
+</div>
 
-    <!-- Conteúdo principal -->
-    <div class="container">
-        <?php foreach ($projetos as $projeto): ?>
-            <div class="project-container">
-                <!-- Imagem do projeto -->
-                <img src="<?= isset($projeto['imagem']) ? 'public/uploads/' . $projeto['imagem'] : 'public/img/default.jpg' ?>" alt="Imagem do Projeto" class="project-image">
+<!-- Conteúdo principal -->
+<div class="container">
 
-                <!-- Detalhes do projeto -->
-                <div class="project-details">
-                    <h2 class="project-title"><?= htmlspecialchars($projeto['titulo']) ?></h2>
-                    <p class="project-subtitle"><?= htmlspecialchars($projeto['subtitulo']) ?></p>
-                    <p class="project-date">Data do Projeto: <?= htmlspecialchars($projeto['data_inicio']) ?></p>
-                </div>
+    <?php foreach ($projetos as $projeto): ?>
+        <div class="project-container">
+            <!-- Imagem do projeto -->
+            <img src="<?= isset($projeto['imagem']) ? 'public/uploads/' . $projeto['imagem'] : 'public/img/default.jpg' ?>" alt="Imagem do Projeto" class="project-image">
+
+            <!-- Detalhes do projeto -->
+            <div class="project-details">
+                <h2 class="project-title"><?= htmlspecialchars($projeto['titulo']) ?></h2>
+                <p class="project-subtitle"><?= htmlspecialchars($projeto['subtitulo']) ?></p>
+                <p class="project-date">Data do Projeto: <?= htmlspecialchars($projeto['data_inicio']) ?></p>
             </div>
-        <?php endforeach; ?>
 
-        <!-- Voltar à página inicial -->
-        <a href="?page=home" class="voltar">← Voltar à Home</a>
-    </div>
+            <!-- Botões de ação -->
+            <div class="project-actions">
+                <a href="?page=projetos&action=edit&id=<?= $projeto['id'] ?>">✏️ Editar</a>
+                <a href="?page=projetos&action=delete&id=<?= $projeto['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir este projeto?');">🗑️ Excluir</a>
+            </div>
+        </div>
+    <?php endforeach; ?>
+
+    <!-- Voltar à página inicial -->
+    <a href="?page=home" class="voltar">← Voltar à Home</a>
+</div>
+
 </body>
 </html>
