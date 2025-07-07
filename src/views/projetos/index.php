@@ -98,15 +98,12 @@
             margin: 0;
         }
 
-        .project-subtitle {
-            font-size: 18px;
-            color: #ccc;
-            margin: 5px 0;
-        }
-
+        .project-subtitle,
+        .project-orientadores,
         .project-date {
-            font-size: 14px;
-            color: #aaa;
+            font-size: 16px;
+            margin: 5px 0;
+            color: #ccc;
         }
 
         /* Ações (Editar/Excluir) */
@@ -163,7 +160,14 @@
             <div class="project-details">
                 <h2 class="project-title"><?= htmlspecialchars($projeto['titulo']) ?></h2>
                 <p class="project-subtitle"><?= htmlspecialchars($projeto['subtitulo']) ?></p>
-                <p class="project-date">Data do Projeto: <?= htmlspecialchars($projeto['data_inicio']) ?></p>
+                
+                <!-- Exibir orientador e coorientador -->
+                <p class="project-orientadores">
+                    <strong>Orientador:</strong> <?= htmlspecialchars($projeto['orientador_nome'] ?? 'Não definido') ?><br>
+                    <strong>Coorientador:</strong> <?= htmlspecialchars($projeto['coorientador_nome'] ?? 'Não definido') ?>
+                </p>
+
+                <p class="project-date">Data de início: <?= htmlspecialchars($projeto['data_inicio']) ?></p>
             </div>
 
             <!-- Botões de ação -->

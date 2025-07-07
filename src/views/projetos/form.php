@@ -78,8 +78,27 @@
             <label for="descricao">Descrição</label>
             <textarea name="descricao" id="descricao" rows="5"><?= $projeto['descricao'] ?? '' ?></textarea>
 
+            <!-- Campo de Orientador -->
             <label for="orientador">Orientador</label>
-            <input type="text" name="orientador" id="orientador" required value="<?= $projeto['orientador'] ?? '' ?>">
+            <select name="orientador" id="orientador">
+                <option value="">Selecione um orientador</option>
+                <?php foreach ($usuariosOrientadores as $usuario): ?>
+                    <option value="<?= $usuario['id'] ?>" <?= (isset($projeto) && $projeto['orientador'] == $usuario['id']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($usuario['nome']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <!-- Campo de Coorientador -->
+            <label for="coorientador">Coorientador</label>
+            <select name="coorientador" id="coorientador">
+                <option value="">Selecione um coorientador</option>
+                <?php foreach ($usuariosCoorientadores as $usuario): ?>
+                    <option value="<?= $usuario['id'] ?>" <?= (isset($projeto) && $projeto['coorientador'] == $usuario['id']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($usuario['nome']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
 
             <label for="data_inicio">Data de Início</label>
             <input type="date" name="data_inicio" id="data_inicio" value="<?= $projeto['data_inicio'] ?? '' ?>">

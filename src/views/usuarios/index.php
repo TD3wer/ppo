@@ -68,12 +68,13 @@
             <div class="user-card">
                 <h2><?= htmlspecialchars($usuario['nome']) ?></h2>
                 <p><strong>Login:</strong> <?= htmlspecialchars($usuario['login']) ?></p>
+                <p><strong>Tipo:</strong> <?= htmlspecialchars($usuario['tipo']) ?></p>
                 <p><strong>Senha (Hash):</strong> <?= htmlspecialchars($usuario['senha']) ?></p>
                 <p><strong>Idade:</strong> <?= htmlspecialchars($usuario['idade']) ?></p>
 
                 <div class="actions">
-                    <a href="?page=usuarios&action=edit&id=<?= $usuario['id'] ?>"><i class="fas fa-pencil-alt"></i> Editar</a>
-                    <a href="?page=usuarios&action=delete&id=<?= $usuario['id'] ?>" onclick="return confirm('Tem certeza de que deseja excluir este usuário?');"><i class="fas fa-trash"></i> Excluir</a>
+                    <a href="?page=usuarios&action=edit&id=<?= $usuario['id'] ?>">✏️ Editar</a>
+                    <a href="?page=usuarios&action=delete&id=<?= $usuario['id'] ?>" onclick="return confirm('Tem certeza de que deseja excluir este usuário?');">🗑️ Excluir</a>
                 </div>
             </div>
         <?php endforeach; ?>

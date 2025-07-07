@@ -8,7 +8,10 @@ class Projeto {
     }
 
     public function getAll() {
-        $stmt = $this->pdo->query("SELECT * FROM projetos ORDER BY id DESC");
+        $stmt = $this->pdo->query("SELECT p.*, u.nome AS orientador_nome, c.nome AS coorientador_nome FROM projetos p
+            LEFT JOIN usuarios u ON p.orientador_id = u.id
+            LEFT JOIN usuarios c ON p.coorientador_id = c.id
+            ORDER BY p.id DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -16,6 +19,12 @@ class Projeto {
         $stmt = $this->pdo->prepare("SELECT * FROM projetos WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getUsuariosPorTipo($tipo) {
+        $stmt = $this->pdo->prepare("SELECT * FROM usuarios WHERE tipo = ?");
+        $stmt->execute([$tipo]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function insert($dados) {
@@ -29,14 +38,15 @@ class Projeto {
 
         $stmt = $this->pdo->prepare("
             INSERT INTO projetos 
-            (titulo, subtitulo, descricao, orientador, data_inicio, data_fim, status, imagem) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (titulo, subtitulo, descricao, orientador_id, coorientador_id, data_inicio, data_fim, status, imagem) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         return $stmt->execute([
             $dados['titulo'],
             $dados['subtitulo'] ?? '',
             $dados['descricao'] ?? '',
-            $dados['orientador'],
+            $dados['orientador'] ?? null,
+            $dados['coorientador'] ?? null,
             $dados['data_inicio'],
             $dados['data_fim'],
             $dados['status'],
@@ -45,12 +55,11 @@ class Projeto {
     }
 
     public function update($id, $dados) {
-        // Upload da imagem (se enviado)
+        // Upload da imagem
         $nomeImagem = $dados['imagem_atual'] ?? null;
         if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
             $pastaUpload = '../public/uploads/';
 
-            // Excluir imagem antiga se existir
             if (!empty($nomeImagem) && file_exists($pastaUpload . $nomeImagem)) {
                 unlink($pastaUpload . $nomeImagem);
             }
@@ -64,7 +73,8 @@ class Projeto {
                 titulo = ?, 
                 subtitulo = ?, 
                 descricao = ?, 
-                orientador = ?, 
+                orientador_id = ?, 
+                coorientador_id = ?, 
                 data_inicio = ?, 
                 data_fim = ?, 
                 status = ?, 
@@ -75,7 +85,8 @@ class Projeto {
             $dados['titulo'],
             $dados['subtitulo'] ?? '',
             $dados['descricao'] ?? '',
-            $dados['orientador'],
+            $dados['orientador'] ?? null,
+            $dados['coorientador'] ?? null,
             $dados['data_inicio'],
             $dados['data_fim'],
             $dados['status'],
@@ -85,18 +96,6 @@ class Projeto {
     }
 
     public function delete($id) {
-        // Buscar imagem antes de deletar
-        $stmt = $this->pdo->prepare("SELECT imagem FROM projetos WHERE id = ?");
-        $stmt->execute([$id]);
-        $projeto = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($projeto && !empty($projeto['imagem'])) {
-            $caminhoImagem = '../public/uploads/' . $projeto['imagem'];
-            if (file_exists($caminhoImagem)) {
-                unlink($caminhoImagem); // Deleta a imagem física
-            }
-        }
-
         $stmt = $this->pdo->prepare("DELETE FROM projetos WHERE id = ?");
         return $stmt->execute([$id]);
     }

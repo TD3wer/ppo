@@ -13,6 +13,9 @@ class ProjetoController {
 
         switch ($action) {
             case 'create':
+                $usuariosOrientadores = $this->model->getUsuariosPorTipo('orientador');
+                $usuariosCoorientadores = $this->model->getUsuariosPorTipo('coorientador');
+
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $this->model->insert($_POST);
                     header('Location: ?page=projetos');
@@ -29,9 +32,11 @@ class ProjetoController {
                 }
 
                 $projeto = $this->model->getById($id);
+                $usuariosOrientadores = $this->model->getUsuariosPorTipo('orientador');
+                $usuariosCoorientadores = $this->model->getUsuariosPorTipo('coorientador');
 
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $_POST['imagem_atual'] = $projeto['imagem']; // Passa a imagem atual para o model
+                    $_POST['imagem_atual'] = $projeto['imagem'];
                     $this->model->update($id, $_POST);
                     header('Location: ?page=projetos');
                     exit;

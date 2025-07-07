@@ -7,6 +7,11 @@ class UsuarioController {
     public function __construct($pdo) {
         $this->model = new Usuario($pdo);
     }
+    public function getByTipo($tipo) {
+    $stmt = $this->pdo->prepare("SELECT id, nome FROM usuarios WHERE tipo = ?");
+    $stmt->execute([$tipo]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }   
 
     public function handleRequest() {
         $action = $_GET['action'] ?? 'index';
@@ -54,4 +59,3 @@ class UsuarioController {
         }
     }
 }
-?>
