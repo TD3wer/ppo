@@ -7,22 +7,30 @@ class Projeto {
         $this->pdo = $pdo;
     }
 
-    public function getAll() {
-        $stmt = $this->pdo->query("SELECT p.*, u.nome AS orientador_nome, c.nome AS coorientador_nome FROM projetos p
-            LEFT JOIN usuarios u ON p.orientador_id = u.id
-            LEFT JOIN usuarios c ON p.coorientador_id = c.id
-            ORDER BY p.id DESC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    public function getAll($tipo = null) {
+        $sql = "SELECT p.*, u.nome AS orientador_nome, c.nome AS coorientador_nome 
+                FROM projetos p
+                LEFT JOIN usuarios u ON p.orientador_id = u.id
+                LEFT JOIN usuarios c ON p.coorientador_id = c.id";
 
-    public function getById($id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM projetos WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+        if ($tipo) {
+            $sql .= " WHERE p.tipo_projeto = ?";
+        }
 
+        $sql .= " ORDER BY p.id DESC";
+
+        if ($tipo) {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$tipo]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $stmt = $this->pdo->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
+    
     public function getUsuariosPorTipo($tipo) {
-        $stmt = $this->pdo->prepare("SELECT * FROM usuarios WHERE tipo = ?");
+        $stmt = $this->pdo->prepare("SELECT id, nome FROM usuarios WHERE tipo = ?");
         $stmt->execute([$tipo]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -56,10 +64,11 @@ class Projeto {
 
         $stmt = $this->pdo->prepare("
             INSERT INTO projetos 
-            (titulo, subtitulo, descricao, orientador_id, coorientador_id, data_inicio, data_fim, status, imagem) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (tipo_projeto, titulo, subtitulo, descricao, orientador_id, coorientador_id, data_inicio, data_fim, status, imagem) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         return $stmt->execute([
+            $dados['tipo_projeto'],
             $dados['titulo'],
             $dados['subtitulo'] ?? '',
             $dados['descricao'] ?? '',
@@ -100,6 +109,7 @@ class Projeto {
 
         $stmt = $this->pdo->prepare("
             UPDATE projetos SET 
+                tipo_projeto = ?,
                 titulo = ?, 
                 subtitulo = ?, 
                 descricao = ?, 
@@ -112,6 +122,7 @@ class Projeto {
             WHERE id = ?
         ");
         return $stmt->execute([
+            $dados['tipo_projeto'],
             $dados['titulo'],
             $dados['subtitulo'] ?? '',
             $dados['descricao'] ?? '',

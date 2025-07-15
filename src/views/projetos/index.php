@@ -166,7 +166,7 @@
             <div class="project-details">
                 <h2 class="project-title"><?= htmlspecialchars($projeto['titulo'] ?? '') ?></h2>
                 <p class="project-subtitle"><?= htmlspecialchars($projeto['subtitulo'] ?? '') ?></p>
-                
+
                 <!-- Exibir orientador e coorientador -->
                 <p class="project-orientadores">
                     <strong>Orientador:</strong> <?= htmlspecialchars($projeto['orientador_nome'] ?? 'Não definido') ?><br>

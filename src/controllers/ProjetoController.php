@@ -55,7 +55,8 @@ class ProjetoController {
 
             case 'index':
             default:
-                $projetos = $this->model->getAll();
+                $tipo = $_GET['tipo'] ?? null;
+                $projetos = $this->model->getAll($tipo);
                 require __DIR__ . '/../views/projetos/index.php';
                 break;
         }

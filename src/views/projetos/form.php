@@ -78,6 +78,22 @@
             <label for="descricao">Descrição</label>
             <textarea name="descricao" id="descricao" rows="5"><?= $projeto['descricao'] ?? '' ?></textarea>
 
+            <label for="tipo_projeto">Tipo do Projeto</label>
+            <select name="tipo_projeto" id="tipo_projeto" required>
+                <option value="ensino" <?= (isset($projeto['tipo_projeto']) && $projeto['tipo_projeto'] === 'ensino') ? 'selected' : '' ?>>
+                    Ensino
+                </option>
+                <option value="extensao" <?= (isset($projeto['tipo_projeto']) && $projeto['tipo_projeto'] === 'extensao') ? 'selected' : '' ?>>
+                    Extensão
+                </option>
+                <option value="pesquisa" <?= (isset($projeto['tipo_projeto']) && $projeto['tipo_projeto'] === 'pesquisa') ? 'selected' : '' ?>>
+                    Pesquisa
+                </option>
+                <option value="intercambio" <?= (isset($projeto['tipo_projeto']) && $projeto['tipo_projeto'] === 'intercambio') ? 'selected' : '' ?>>
+                    Intercâmbio
+                </option>
+            </select>
+
             <!-- Campo de Orientador -->
             <label for="orientador">Orientador</label>
             <select name="orientador" id="orientador">
