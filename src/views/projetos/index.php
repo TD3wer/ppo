@@ -86,6 +86,7 @@
             height: 100px;
             object-fit: cover;
             border-radius: 8px;
+            border: 1px solid #444;
         }
 
         .project-details {
@@ -154,12 +155,17 @@
     <?php foreach ($projetos as $projeto): ?>
         <div class="project-container">
             <!-- Imagem do projeto -->
-            <img src="<?= isset($projeto['imagem']) ? 'public/uploads/' . $projeto['imagem'] : 'public/img/default.jpg' ?>" alt="Imagem do Projeto" class="project-image">
+            <img 
+                src="<?= !empty($projeto['imagem']) ? 'public/uploads/' . htmlspecialchars($projeto['imagem']) : 'public/img/default.jpg' ?>" 
+                alt="Imagem do Projeto" 
+                class="project-image"
+                onerror="this.src='public/img/default.jpg'; this.onerror=null;"
+            >
 
             <!-- Detalhes do projeto -->
             <div class="project-details">
-                <h2 class="project-title"><?= htmlspecialchars($projeto['titulo']) ?></h2>
-                <p class="project-subtitle"><?= htmlspecialchars($projeto['subtitulo']) ?></p>
+                <h2 class="project-title"><?= htmlspecialchars($projeto['titulo'] ?? '') ?></h2>
+                <p class="project-subtitle"><?= htmlspecialchars($projeto['subtitulo'] ?? '') ?></p>
                 
                 <!-- Exibir orientador e coorientador -->
                 <p class="project-orientadores">
@@ -167,7 +173,7 @@
                     <strong>Coorientador:</strong> <?= htmlspecialchars($projeto['coorientador_nome'] ?? 'Não definido') ?>
                 </p>
 
-                <p class="project-date">Data de início: <?= htmlspecialchars($projeto['data_inicio']) ?></p>
+                <p class="project-date">Data de início: <?= htmlspecialchars($projeto['data_inicio'] ?? '') ?></p>
             </div>
 
             <!-- Botões de ação -->

@@ -28,12 +28,30 @@ class Projeto {
     }
 
     public function insert($dados) {
-        // Upload da imagem
         $nomeImagem = null;
+
         if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
-            $pastaUpload = '../public/uploads/';
-            $nomeImagem = uniqid('img_') . '_' . basename($_FILES['imagem']['name']);
-            move_uploaded_file($_FILES['imagem']['tmp_name'], $pastaUpload . $nomeImagem);
+            // Caminho absoluto baseado na pasta raiz do projeto
+            $pastaUpload = __DIR__ . '/../../public/uploads/';
+
+            // Garantir que a pasta exista
+            if (!is_dir($pastaUpload)) {
+                die("Pasta uploads não existe: " . $pastaUpload);
+            }
+
+            // Garantir permissão de escrita
+            if (!is_writable($pastaUpload)) {
+                die("Pasta uploads não tem permissão de escrita.");
+            }
+
+            // Gerar nome único para a imagem
+            $nomeArquivo = basename($_FILES['imagem']['name']);
+            $nomeImagem = uniqid('img_') . '_' . $nomeArquivo;
+
+            // Mover o arquivo
+            if (!move_uploaded_file($_FILES['imagem']['tmp_name'], $pastaUpload . $nomeImagem)) {
+                die("Erro ao mover imagem: " . $_FILES['imagem']['name']);
+            }
         }
 
         $stmt = $this->pdo->prepare("
@@ -55,17 +73,29 @@ class Projeto {
     }
 
     public function update($id, $dados) {
-        // Upload da imagem
         $nomeImagem = $dados['imagem_atual'] ?? null;
+
         if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
-            $pastaUpload = '../public/uploads/';
+            $pastaUpload = __DIR__ . '/../../public/uploads/';
+
+            if (!is_dir($pastaUpload)) {
+                die("Pasta uploads não existe: " . $pastaUpload);
+            }
+
+            if (!is_writable($pastaUpload)) {
+                die("Pasta uploads não tem permissão de escrita.");
+            }
 
             if (!empty($nomeImagem) && file_exists($pastaUpload . $nomeImagem)) {
                 unlink($pastaUpload . $nomeImagem);
             }
 
-            $nomeImagem = uniqid('img_') . '_' . basename($_FILES['imagem']['name']);
-            move_uploaded_file($_FILES['imagem']['tmp_name'], $pastaUpload . $nomeImagem);
+            $nomeArquivo = basename($_FILES['imagem']['name']);
+            $nomeImagem = uniqid('img_') . '_' . $nomeArquivo;
+
+            if (!move_uploaded_file($_FILES['imagem']['tmp_name'], $pastaUpload . $nomeImagem)) {
+                die("Erro ao mover imagem: " . $_FILES['imagem']['name']);
+            }
         }
 
         $stmt = $this->pdo->prepare("
