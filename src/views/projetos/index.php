@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Lista de Projetos | GEOPLANTEX</title>
     <link rel="stylesheet" href="public/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css " integrity="sha512-iecdLmaskl7CVkqkPtElBPsQSXPAUvRSOMc9dLJpuDwcG8uA5vJ2tCS9buZ68zjd37W9hsIiespUdvntg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Estilo geral */
         body {
@@ -146,42 +147,76 @@
         <img src="public/img/LogoB.png" alt="Logo Geoplantex">
         <h1>GEOPLANTEX</h1>
     </div>
-    <a href="?page=projetos&action=create" class="add-project-btn">+ Novo Projeto</a>
-</div>
 
+    <!-- Botão para adicionar novo projeto -->
+    <a href="?page=projetos&action=create" class="add-project-btn">+ Novo Projeto</a>
+
+    <!-- Barra de pesquisa -->
+    <form class="search-bar" method="get">
+        <input type="hidden" name="page" value="<?= htmlspecialchars($_GET['page'] ?? 'projetos') ?>">
+        <?php if (isset($_GET['tipo'])): ?>
+            <input type="hidden" name="tipo" value="<?= htmlspecialchars($_GET['tipo']) ?>">
+        <?php endif; ?>
+
+        <div class="search-container">
+            <i class="fas fa-search"></i> <!-- Ícone de lupa -->
+            <input type="text" name="pesquisa" placeholder="Pesquisar projeto..." value="<?= isset($_GET['pesquisa']) ? htmlspecialchars($_GET['pesquisa']) : '' ?>">
+        </div>
+    </form>
+</div>
 <!-- Conteúdo principal -->
 <div class="container">
 
     <?php foreach ($projetos as $projeto): ?>
-        <div class="project-container">
-            <!-- Imagem do projeto -->
-            <img 
-                src="<?= !empty($projeto['imagem']) ? 'public/uploads/' . htmlspecialchars($projeto['imagem']) : 'public/img/default.jpg' ?>" 
-                alt="Imagem do Projeto" 
-                class="project-image"
-                onerror="this.src='public/img/default.jpg'; this.onerror=null;"
-            >
+        <?php
+// Buscar colaboradores do projeto
+$colaboradores = $this->model->getColaboradores($projeto['id']);
+?>
 
-            <!-- Detalhes do projeto -->
-            <div class="project-details">
-                <h2 class="project-title"><?= htmlspecialchars($projeto['titulo'] ?? '') ?></h2>
-                <p class="project-subtitle"><?= htmlspecialchars($projeto['subtitulo'] ?? '') ?></p>
+<div class="project-container">
+    <!-- Imagem do projeto -->
+    <img 
+        src="<?= !empty($projeto['imagem']) ? 'public/uploads/' . htmlspecialchars($projeto['imagem']) : 'public/img/default.jpg' ?>" 
+        alt="Imagem do Projeto" 
+        class="project-image"
+        onerror="this.src='public/img/default.jpg'; this.onerror=null;"
+    >
 
-                <!-- Exibir orientador e coorientador -->
-                <p class="project-orientadores">
-                    <strong>Orientador:</strong> <?= htmlspecialchars($projeto['orientador_nome'] ?? 'Não definido') ?><br>
-                    <strong>Coorientador:</strong> <?= htmlspecialchars($projeto['coorientador_nome'] ?? 'Não definido') ?>
-                </p>
+    <!-- Detalhes do projeto -->
+    <div class="project-details">
+        <h2 class="project-title"><?= htmlspecialchars($projeto['titulo'] ?? '') ?></h2>
+        <p class="project-subtitle"><?= htmlspecialchars($projeto['subtitulo'] ?? '') ?></p>
+        
+        <!-- Exibir orientador e coorientador -->
+        <p class="project-orientadores">
+            <strong>Orientador:</strong> <?= htmlspecialchars($projeto['orientador_nome'] ?? 'Não definido') ?><br>
+            <strong>Coorientador:</strong> <?= htmlspecialchars($projeto['coorientador_nome'] ?? 'Não definido') ?>
+        </p>
 
-                <p class="project-date">Data de início: <?= htmlspecialchars($projeto['data_inicio'] ?? '') ?></p>
-            </div>
+        <p class="project-date">Data de início: <?= htmlspecialchars($projeto['data_inicio'] ?? '') ?></p>
 
-            <!-- Botões de ação -->
-            <div class="project-actions">
-                <a href="?page=projetos&action=edit&id=<?= $projeto['id'] ?>">✏️ Editar</a>
-                <a href="?page=projetos&action=delete&id=<?= $projeto['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir este projeto?');">🗑️ Excluir</a>
-            </div>
-        </div>
+        <!-- Colaboradores -->
+        <?php
+        // Garantir que $colaboradores seja um array e não vazio
+        $colaboradoresNomes = !empty($colaboradores) ? array_column($colaboradores, 'nome') : [];
+        ?>
+        <?php if (!empty($colaboradoresNomes)): ?>
+            <p class="project-colaboradores">
+                <strong>Colaboradores:</strong>
+                <?= htmlspecialchars(implode(', ', $colaboradoresNomes)) ?>
+            </p>
+        <?php else: ?>
+            <p class="project-colaboradores"><strong>Nenhum colaborador associado.</strong></p>
+        <?php endif; ?>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="project-actions">
+        <a href="?page=projetos&action=edit&id=<?= $projeto['id'] ?>">✏️ Editar</a>
+        <a href="?page=projetos&action=delete&id=<?= $projeto['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir este projeto?');">🗑️ Excluir</a>
+        <a href="?page=projetos&action=colaboradores&id=<?= $projeto['id'] ?>">👥 Colaboradores</a>
+    </div>
+</div>
     <?php endforeach; ?>
 
     <!-- Voltar à página inicial -->

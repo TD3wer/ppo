@@ -153,3 +153,54 @@ main.projetos .nav-bar a.active {
 .search-icon {
   display: none;
 }
+
+/* Barra de pesquisa */
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto; /* Alinha à direita */
+
+}
+
+.search-container {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-container i {
+    color: white;
+    font-size: 18px;
+}
+
+.search-container input[type="text"] {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    outline: none;
+    width: 100%;
+}
+
+.search-container input[type="text"]::placeholder {
+    color: #ccc;
+}
+
+.project-colaboradores {
+  margin-top: 10px;
+}
+
+.project-colaboradores p {
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.collaborator-names {
+  font-size: 14px;
+  color: #ccc;
+}

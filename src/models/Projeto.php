@@ -7,28 +7,43 @@ class Projeto {
         $this->pdo = $pdo;
     }
 
-    public function getAll($tipo = null) {
+    public function getAll($tipo = null, $termo = null) {
         $sql = "SELECT p.*, u.nome AS orientador_nome, c.nome AS coorientador_nome 
                 FROM projetos p
                 LEFT JOIN usuarios u ON p.orientador_id = u.id
-                LEFT JOIN usuarios c ON p.coorientador_id = c.id";
+                LEFT JOIN usuarios c ON p.coorientador_id = c.id WHERE 1=1";
 
         if ($tipo) {
-            $sql .= " WHERE p.tipo_projeto = ?";
+            $sql .= " AND p.tipo_projeto = ?";
+        }
+
+        if ($termo) {
+            $sql .= " AND p.titulo LIKE ?";
         }
 
         $sql .= " ORDER BY p.id DESC";
 
-        if ($tipo) {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$tipo]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            $stmt = $this->pdo->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->prepare($sql);
+
+        $params = [];
+        if ($tipo && $termo) {
+            $params = [$tipo, "%$termo%"];
+        } elseif ($tipo) {
+            $params = [$tipo];
+        } elseif ($termo) {
+            $params = ["%$termo%"];
         }
+
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
+    public function getById($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM projetos WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function getUsuariosPorTipo($tipo) {
         $stmt = $this->pdo->prepare("SELECT id, nome FROM usuarios WHERE tipo = ?");
         $stmt->execute([$tipo]);
@@ -39,26 +54,21 @@ class Projeto {
         $nomeImagem = null;
 
         if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
-            // Caminho absoluto baseado na pasta raiz do projeto
             $pastaUpload = __DIR__ . '/../../public/uploads/';
 
-            // Garantir que a pasta exista
             if (!is_dir($pastaUpload)) {
-                die("Pasta uploads não existe: " . $pastaUpload);
+                die("Pasta uploads não existe.");
             }
 
-            // Garantir permissão de escrita
             if (!is_writable($pastaUpload)) {
                 die("Pasta uploads não tem permissão de escrita.");
             }
 
-            // Gerar nome único para a imagem
             $nomeArquivo = basename($_FILES['imagem']['name']);
             $nomeImagem = uniqid('img_') . '_' . $nomeArquivo;
 
-            // Mover o arquivo
             if (!move_uploaded_file($_FILES['imagem']['tmp_name'], $pastaUpload . $nomeImagem)) {
-                die("Erro ao mover imagem: " . $_FILES['imagem']['name']);
+                die("Erro ao mover imagem.");
             }
         }
 
@@ -88,7 +98,7 @@ class Projeto {
             $pastaUpload = __DIR__ . '/../../public/uploads/';
 
             if (!is_dir($pastaUpload)) {
-                die("Pasta uploads não existe: " . $pastaUpload);
+                die("Pasta uploads não existe.");
             }
 
             if (!is_writable($pastaUpload)) {
@@ -103,7 +113,7 @@ class Projeto {
             $nomeImagem = uniqid('img_') . '_' . $nomeArquivo;
 
             if (!move_uploaded_file($_FILES['imagem']['tmp_name'], $pastaUpload . $nomeImagem)) {
-                die("Erro ao mover imagem: " . $_FILES['imagem']['name']);
+                die("Erro ao mover imagem.");
             }
         }
 
@@ -139,5 +149,31 @@ class Projeto {
     public function delete($id) {
         $stmt = $this->pdo->prepare("DELETE FROM projetos WHERE id = ?");
         return $stmt->execute([$id]);
+    }
+
+    public function getColaboradores($projeto_id) {
+        $stmt = $this->pdo->prepare("
+            SELECT u.id, u.nome 
+            FROM projetos_colaboradores pc
+            JOIN usuarios u ON pc.usuario_id = u.id
+            WHERE pc.projeto_id = ?
+        ");
+        $stmt->execute([$projeto_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getUsuariosParaColaboracao() {
+        $stmt = $this->pdo->query("SELECT id, nome, tipo FROM usuarios WHERE tipo IN ('bolsista', 'aluno')");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function deleteColaboradores($projeto_id) {
+        $stmt = $this->pdo->prepare("DELETE FROM projetos_colaboradores WHERE projeto_id = ?");
+        return $stmt->execute([$projeto_id]);
+    }
+
+    public function addColaborador($projeto_id, $usuario_id) {
+        $stmt = $this->pdo->prepare("INSERT INTO projetos_colaboradores (projeto_id, usuario_id) VALUES (?, ?)");
+        return $stmt->execute([$projeto_id, $usuario_id]);
     }
 }

@@ -53,10 +53,45 @@ class ProjetoController {
                 header('Location: ?page=projetos');
                 break;
 
+            case 'colaboradores':
+                $id = $_GET['id'] ?? null;
+                if (!$id) {
+                    die("ID do projeto não fornecido.");
+                }
+
+                // Buscar todos os bolsistas e alunos disponíveis
+                $usuarios = $this->model->getUsuariosParaColaboracao();
+
+                // Buscar colaboradores já associados
+                $colaboradoresAtuais = $this->model->getColaboradores($id);
+
+                // Se for POST, salvar novos colaboradores
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $colaboradores = $_POST['colaboradores'] ?? [];
+
+                    // Deletar antigos
+                    $this->model->deleteColaboradores($id);
+
+                    // Adicionar novos colaboradores
+                    foreach ($colaboradores as $usuario_id) {
+                        $this->model->addColaborador($id, $usuario_id);
+                    }
+
+                    header("Location: ?page=projetos&action=colaboradores&id=$id");
+                    exit;
+                }
+
+                // Passar colaboradores atuais para a view
+                $colaboradoresAtuais = $this->model->getColaboradores($id);
+
+                require __DIR__ . '/../views/projetos/colaboradores.php';
+                break;
+
             case 'index':
             default:
                 $tipo = $_GET['tipo'] ?? null;
-                $projetos = $this->model->getAll($tipo);
+                $termo = $_GET['pesquisa'] ?? null;
+                $projetos = $this->model->getAll($tipo, $termo);
                 require __DIR__ . '/../views/projetos/index.php';
                 break;
         }
